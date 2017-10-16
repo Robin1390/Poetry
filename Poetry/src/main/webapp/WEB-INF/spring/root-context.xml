@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:tx="http://www.springframework.org/schema/tx"
+    xmlns:mvc="http://www.springframework.org/schema/mvc"
+    xmlns:hz="http://www.hazelcast.com/schema/spring"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd 
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
+        http://www.hazelcast.com/schema/spring http://www.hazelcast.com/schema/spring/hazelcast-spring-3.1.xsd">
+
+
+	<context:property-placeholder file-encoding="UTF-8" location="classpath:db.properties" ignore-unresolvable="true"/> 
+	<context:property-placeholder location="classpath:application.properties" ignore-unresolvable="true"/>
+	<context:component-scan base-package="com.Poetry" />
+	
+	<tx:annotation-driven transaction-manager="TransactionManager" />
+	
+	<!-- <bean id="applicationConstants" class="com.channelplay.dms.utils.ApplicationConstants">
+         <property name="skuUploadPath" value="${sku.file.path}"/>
+    </bean>	 -->		
+	<!-- TX Database 1 (DMS)-->
+	<bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<property name="driverClass">
+			<value>com.mysql.jdbc.Driver</value>
+		</property>
+		<property name="jdbcUrl">
+			<value>${db1.url}</value>
+		</property>
+
+		<property name="user" value="${db1.user}" />
+		<property name="password" value="${db1.password}" />
+	</bean>
+	
+	
+	<bean id="db1SessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
+        <property name="dataSource" ref="dataSource" />
+        <property name="packagesToScan" value="com.Poetry" />
+        <property name="hibernateProperties">
+            <props>
+				<prop key="hibernate.show_sql">${hibernate.show_sql}</prop>
+				<prop key="hibernate.dialect">${hibernate.dialect}</prop>
+				<prop key="hibernate.id.new_generator_mappings">true</prop>
+			</props>
+        </property>
+    </bean>
+    
+    <bean id="TransactionManager"
+        class="org.springframework.orm.hibernate4.HibernateTransactionManager">
+        <property name="sessionFactory" ref="db1SessionFactory" />
+    </bean>
+    
+
+	
+</beans>
